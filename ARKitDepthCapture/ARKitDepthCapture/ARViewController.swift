@@ -8,6 +8,7 @@
 import UIKit
 import ARKit
 import AVFoundation
+import Photos
 
 class ARViewController: UIViewController {
     
@@ -192,14 +193,36 @@ class ARViewController: UIViewController {
         let filename = "\(prefix)_\(timestamp).png"
         let fileURL = documentsPath.appendingPathComponent(filename)
         
-        // Save as PNG
+        // Save as PNG to Documents directory (accessible via Files app)
         if let imageData = image.pngData() {
             do {
                 try imageData.write(to: fileURL)
-                print("Saved: \(filename)")
+                print("Saved to Documents: \(filename)")
             } catch {
-                print("Save failed: \(error.localizedDescription)")
+                print("Save to Documents failed: \(error.localizedDescription)")
             }
+        }
+        
+        // Also save to Photo Library (accessible via Photos app)
+        saveToPhotoLibrary(image)
+    }
+    
+    private func saveToPhotoLibrary(_ image: UIImage) {
+        PHPhotoLibrary.requestAuthorization { [weak self] status in
+            guard status == .authorized || status == .limited else {
+                print("Photo library access denied")
+                return
+            }
+            
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }, completionHandler: { success, error in
+                if success {
+                    print("Saved to Photo Library")
+                } else if let error = error {
+                    print("Save to Photo Library failed: \(error.localizedDescription)")
+                }
+            })
         }
     }
     

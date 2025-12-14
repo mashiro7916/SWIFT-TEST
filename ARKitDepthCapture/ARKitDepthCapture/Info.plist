@@ -55,6 +55,10 @@
 	<string>This app needs to save captured images to photo library</string>
 	<key>UIRequiresFullScreen</key>
 	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 </dict>
 </plist>
 
